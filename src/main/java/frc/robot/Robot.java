@@ -27,23 +27,16 @@ import edu.wpi.first.wpilibj.Compressor;
  * directory.
  */
 public class Robot extends TimedRobot {
-  //private final PWMSparkMax m_leftDrive = new PWMSparkMax(0);
-  //private final PWMSparkMax m_rightDrive = new PWMSparkMax(1);
-  //private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftDrive, m_rightDrive);
- 
-  Compressor comp = new Compressor(null);
-  // DoubleSolenoid corresponds to a double solenoid.
-   DoubleSolenoid m_doubleSolenoid =
-      new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 2);
-  
 
-
-  private final Timer m_timer = new Timer();
-
-  VictorSPX Vspx1 = new VictorSPX(0); // needs to match device ID in tuner //left
+  //Victor SPX 
+  //deviceNumber matches the device ID shown in PhoenixTunerX
+  VictorSPX Vspx1 = new VictorSPX(0); //left 
   VictorSPX Vspx2 = new VictorSPX(1); //left
   VictorSPX Vspx3 = new VictorSPX(3); //right
   VictorSPX Vspx4 = new VictorSPX(4); //right
+
+  //Xbox Controller
+  //default is port 0
   private final XboxController m_controller = new XboxController(0);
 
   
@@ -53,51 +46,40 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   @Override
-  public void robotInit() {
-    // We need to invert one side of the drivetrain so that positive voltages
-    // result in both sides moving forward. Depending on how your robot's
-    // gearbox is constructed, you might have to invert the left side instead.
-    //m_rightDrive.setInverted(true);
-
-
-    
-  }
+  public void robotInit() {}
 
   /** This function is run once each time the robot enters autonomous mode. */
   @Override
-  public void autonomousInit() {
-    m_timer.reset();
-    m_timer.start();
-  }
+  public void autonomousInit() {}
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {
-    // Drive for 2 seconds
-    if (m_timer.get() < 2.0) {
-      // Drive forwards half speed, make sure to turn input squaring off
-      //m_robotDrive.arcadeDrive(0.5, 0.0, false);
-    } else {
-      //m_robotDrive.stopMotor(); // stop robot
-    }
-  }
+  public void autonomousPeriodic() {}
 
   /** This function is called once each time the robot enters teleoperated mode. */
   @Override
   public void teleopInit() {
-    //doesn't look like it's doing
+
+    //doesn't look like it did anything as compared to how the wheels turned without it
     Vspx1.setInverted(false);
     Vspx2.setInverted(false);
     Vspx3.setInverted(false);
     Vspx4.setInverted(false);
   }
+
   /** This function is called periodically during teleoperated mode. */
   @Override
   public void teleopPeriodic() {
-    //m_robotDrive.arcadeDrive(-m_controller.getLeftY(), -m_controller.getRightX());
     
+    //gets the Xbox controller values for: 
+    // * .2 to make it slower 
+
+    //left joystick on the controller
     double vert = m_controller.getRawAxis(1) * .2;
+    //right joystick on the controller
     double horiz = m_controller.getRawAxis(4) * .2;
+
+    //if we aren't moving the the bot forwards or back, then we can turn it
     if(vert >= -0.09 && vert <= 0.09)
     {
       Vspx1.set(ControlMode.PercentOutput, horiz);//left
@@ -106,6 +88,7 @@ public class Robot extends TimedRobot {
       Vspx4.set(ControlMode.PercentOutput, horiz);//right
     }
 
+    //if we aren't turning the bot, we can move it forwards and back
     if(horiz >= -0.09 && horiz <= 0.09)
     {
       Vspx1.set(ControlMode.PercentOutput, vert * -1);//left
