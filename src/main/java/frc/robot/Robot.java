@@ -12,6 +12,12 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;  
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Compressor;
 
 
 /**
@@ -25,13 +31,22 @@ public class Robot extends TimedRobot {
   //private final PWMSparkMax m_rightDrive = new PWMSparkMax(1);
   //private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftDrive, m_rightDrive);
  
+  Compressor comp = new Compressor(null);
+  // DoubleSolenoid corresponds to a double solenoid.
+   DoubleSolenoid m_doubleSolenoid =
+      new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 2);
+  
+
+
   private final Timer m_timer = new Timer();
 
-  VictorSPX Vspx1 = new VictorSPX(0); // needs to match device ID in tuner // right
-  VictorSPX Vspx2 = new VictorSPX(1); //right
-  VictorSPX Vspx3 = new VictorSPX(3); //left
-  VictorSPX Vspx4 = new VictorSPX(4); //left
+  VictorSPX Vspx1 = new VictorSPX(0); // needs to match device ID in tuner //left
+  VictorSPX Vspx2 = new VictorSPX(1); //left
+  VictorSPX Vspx3 = new VictorSPX(3); //right
+  VictorSPX Vspx4 = new VictorSPX(4); //right
   private final XboxController m_controller = new XboxController(0);
+
+  
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -82,11 +97,22 @@ public class Robot extends TimedRobot {
     //m_robotDrive.arcadeDrive(-m_controller.getLeftY(), -m_controller.getRightX());
     
     double vert = m_controller.getRawAxis(1) * .2;
-    double horiz = m_controller.getRawAxis(0) * .2;
-    Vspx1.set(ControlMode.PercentOutput, vert * (1-horiz));//right
-    Vspx2.set(ControlMode.PercentOutput, vert * (1-horiz));//right
-    Vspx3.set(ControlMode.PercentOutput, vert * -1 * (1-horiz * -1));//left
-    Vspx4.set(ControlMode.PercentOutput, vert * -1 * (1-horiz * -1));//left
+    double horiz = m_controller.getRawAxis(4) * .2;
+    if(vert >= -0.09 && vert <= 0.09)
+    {
+      Vspx1.set(ControlMode.PercentOutput, horiz);//left
+      Vspx2.set(ControlMode.PercentOutput, horiz);//left
+      Vspx3.set(ControlMode.PercentOutput, horiz);//right
+      Vspx4.set(ControlMode.PercentOutput, horiz);//right
+    }
+
+    if(horiz >= -0.09 && horiz <= 0.09)
+    {
+      Vspx1.set(ControlMode.PercentOutput, vert * -1);//left
+      Vspx2.set(ControlMode.PercentOutput, vert * -1);//left
+      Vspx3.set(ControlMode.PercentOutput, vert);//right
+      Vspx4.set(ControlMode.PercentOutput, vert);//right
+    }
   }
 
   /** This function is called once each time the robot enters test mode. */
