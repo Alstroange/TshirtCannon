@@ -89,7 +89,7 @@ public class Robot extends TimedRobot {
     }
 
     //if we aren't turning the bot, we can move it forwards and back
-    if(horiz >= -0.09 && horiz <= 0.09)
+    else if(horiz >= -0.09 && horiz <= 0.09)
     {
       Vspx1.set(ControlMode.PercentOutput, vert * -1);//left
       Vspx2.set(ControlMode.PercentOutput, vert * -1);//left
