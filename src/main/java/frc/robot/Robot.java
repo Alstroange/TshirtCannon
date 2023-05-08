@@ -37,9 +37,7 @@ public class Robot extends TimedRobot {
 
   //Xbox Controller
   //default is port 0
-  private final XboxController m_controller = new XboxController(0);
-
-  
+  private final XboxController m_controller = new XboxController(0);  
 
   /**
    * This function is run when the robot is first started up and should be used for any
