@@ -10,7 +10,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;  
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -56,10 +57,18 @@ public class Robot extends TimedRobot {
   private RelativeEncoder m_encoder;
   public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput;
   double rotations = 0.0;
+
+
+  private CANSparkMax m_motor2;
       
 
   @Override
   public void robotInit() {
+
+      //solenoid motor controller
+      m_motor2 = new CANSparkMax(40, MotorType.kBrushless);
+
+
       //SPARKMAX POSITION CONTROL LOOP EXAMPLE CODE
       // initialize motor
       m_motor = new CANSparkMax(deviceID, MotorType.kBrushless);
@@ -159,18 +168,19 @@ public class Robot extends TimedRobot {
     //if we aren't turning the bot, we can move it forwards and back
     else if(horiz >= -0.09 && horiz <= 0.09)
     {
-      Vspx1.set(ControlMode.PercentOutput, vert * -1);//left
-      Vspx2.set(ControlMode.PercentOutput, vert * -1);//left
-      Vspx3.set(ControlMode.PercentOutput, vert);//right
-      Vspx4.set(ControlMode.PercentOutput, vert);//right
+      //Vspx1.set(ControlMode.PercentOutput, vert * -1);//left
+      //Vspx2.set(ControlMode.PercentOutput, vert * -1);//left
+      //Vspx3.set(ControlMode.PercentOutput, vert);//right
+      //Vspx4.set(ControlMode.PercentOutput, vert);//right
     }
     //WORKS
      //switch the output on the Double Solenoid using buttons on the Xbox Controller
      if (m_controller.getLeftBumper()) {          //retract
-      m_doubleSolenoid.set(DoubleSolenoid.Value.kForward);
+      //m_doubleSolenoid.set(DoubleSolenoid.Value.kForward);
     } 
     else if (m_controller.getRightBumper()) {     //extend
-        m_doubleSolenoid.set(DoubleSolenoid.Value.kReverse);
+      //m_doubleSolenoid.set(DoubleSolenoid.Value.kReverse);
+      m_motor2.setVoltage(12);
     }
 
     //WORKS
@@ -233,6 +243,26 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("SetPoint", rotations);
     SmartDashboard.putNumber("ProcessVariable", m_encoder.getPosition());
 
+    m_motor2.set(vert);
+
+  }
+
+    public void robotPeriodic() {
+    /**
+     * There are several useful bus measurements you can get from the SparkMax.
+     * This includes bus voltage (V), output current (A), Applied Output 
+     * (duty cycle), and motor temperature (C)
+     */
+    double busVoltage = m_motor2.getBusVoltage();
+    double current = m_motor2.getOutputCurrent();
+    double appliedOut = m_motor2.getAppliedOutput();
+    double temperature = m_motor2.getMotorTemperature();
+
+    // Open SmartDashboard when your program is running to see the values
+    SmartDashboard.putNumber("Bus Voltage", busVoltage);
+    SmartDashboard.putNumber("Current", current);
+    SmartDashboard.putNumber("Applied Output", appliedOut);
+    SmartDashboard.putNumber("Motor Temperature", temperature);
 
   }
 
